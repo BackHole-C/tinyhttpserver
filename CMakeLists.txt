@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(TinyHttpServer VERSION 2.0.0)
 
 # 设置C++标准
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -22,12 +22,17 @@ set(SERVER_SOURCES
     src/http/http_response.cpp
     src/utils/thread_pool.cpp
     src/cache/file_cache.cpp
+    src/cache/redis_cache.cpp
     src/db/database.cpp
 )
 
 # 链接 SQLite3 库
 find_package(SQLite3 REQUIRED)
 include_directories(${SQLite3_INCLUDE_DIRS})
+
+# 链接 Redis 库
+include_directories(/usr/local/include)
+include_directories(/usr/include/hiredis)
 
 # 可执行文件
 add_executable(server
@@ -42,4 +47,4 @@ set_target_properties(server PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
 )
 
-target_link_libraries(server ${SQLite3_LIBRARIES})
+target_link_libraries(server ${SQLite3_LIBRARIES} redis++ hiredis)

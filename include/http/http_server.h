@@ -9,6 +9,7 @@
 #include "http/connection.h"
 #include "utils/thread_pool.h"
 #include "cache/file_cache.h"
+#include "cache/redis_cache.h"
 #include "db/database.h"
 
 class HttpServer
@@ -48,6 +49,7 @@ private:
     std::unordered_map<int, std::unique_ptr<Connection>> connections_;
     std::unique_ptr<ThreadPool> thread_pool_;
     std::unique_ptr<FileCache> file_cache_;
+    std::unique_ptr<RedisCache> redis_cache_;
     std::unique_ptr<Database> database_;
 
     int connection_timeout_;
@@ -57,7 +59,12 @@ private:
     void initialize_epoll();
     void initialize_thread_pool();
     void initialize_file_cache();
+    void initialize_redis_cache();
     void initialize_database();
+
+    FileCache* get_file_cache() const { return file_cache_.get(); }
+    RedisCache* get_redis_cache() const { return redis_cache_.get(); }
+    Database* get_database() const { return database_.get(); }
 
     void set_nonblocking(int fd);
     void add_epoll_event(int fd, uint32_t events);

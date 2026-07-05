@@ -44,6 +44,13 @@ FileCache* Connection::get_file_cache() const {
     return nullptr;
 }
 
+RedisCache* Connection::get_redis_cache() const {
+    if (server_) {
+        return server_->redis_cache_.get();
+    }
+    return nullptr;
+}
+
 Database* Connection::get_database() const {
     if (server_) {
         return server_->database_.get();
@@ -285,6 +292,7 @@ void Connection::handle_echo_request() {
 
 void Connection::handle_api_messages() {
     Database* db = get_database();
+    RedisCache* redis_cache = get_redis_cache();
     if (!db) {
         response_.set_error_response(HttpResponse::StatusCode::INTERNAL_SERVER_ERROR,
                                      "Database not available");
@@ -295,33 +303,46 @@ void Connection::handle_api_messages() {
     }
 
     if (request_.get_method() == HttpRequest::Method::GET) {
-        std::vector<Message> messages;
-        if (db->get_messages(messages)) {
-            std::string json = "[\n";
-            for (size_t i = 0; i < messages.size(); ++i) {
-                const Message& msg = messages[i];
-                json += "  {\n";
-                json += "    \"id\": " + std::to_string(msg.id) + ",\n";
-                json += "    \"name\": \"" + msg.name + "\",\n";
-                json += "    \"email\": \"" + msg.email + "\",\n";
-                json += "    \"content\": \"" + msg.content + "\",\n";
-                json += "    \"created_at\": \"" + msg.created_at + "\"\n";
-                json += "  }";
-                if (i < messages.size() - 1) {
-                    json += ",";
-                }
-                json += "\n";
-            }
-            json += "]";
-
+        std::string cached_json;
+        if (redis_cache && redis_cache->is_connected() && redis_cache->get("messages_cache", cached_json)) {
             response_.set_status(static_cast<int>(HttpResponse::StatusCode::OK), "OK");
             response_.set_content_type("application/json; charset=utf-8");
-            response_.set_content_length(json.size());
-            response_.set_body(json);
-            Logger::instance().info("API: GET /api/messages, count: " + std::to_string(messages.size()));
+            response_.set_content_length(cached_json.size());
+            response_.set_body(cached_json);
+            Logger::instance().info("API: GET /api/messages, from cache");
         } else {
-            response_.set_error_response(HttpResponse::StatusCode::INTERNAL_SERVER_ERROR,
-                                         "Failed to query messages");
+            std::vector<Message> messages;
+            if (db->get_messages(messages)) {
+                std::string json = "[\n";
+                for (size_t i = 0; i < messages.size(); ++i) {
+                    const Message& msg = messages[i];
+                    json += "  {\n";
+                    json += "    \"id\": " + std::to_string(msg.id) + ",\n";
+                    json += "    \"name\": \"" + msg.name + "\",\n";
+                    json += "    \"email\": \"" + msg.email + "\",\n";
+                    json += "    \"content\": \"" + msg.content + "\",\n";
+                    json += "    \"created_at\": \"" + msg.created_at + "\"\n";
+                    json += "  }";
+                    if (i < messages.size() - 1) {
+                        json += ",";
+                    }
+                    json += "\n";
+                }
+                json += "]";
+
+                response_.set_status(static_cast<int>(HttpResponse::StatusCode::OK), "OK");
+                response_.set_content_type("application/json; charset=utf-8");
+                response_.set_content_length(json.size());
+                response_.set_body(json);
+                Logger::instance().info("API: GET /api/messages, count: " + std::to_string(messages.size()));
+
+                if (redis_cache && redis_cache->is_connected()) {
+                    redis_cache->put("messages_cache", json, 60);
+                }
+            } else {
+                response_.set_error_response(HttpResponse::StatusCode::INTERNAL_SERVER_ERROR,
+                                             "Failed to query messages");
+            }
         }
     } else if (request_.get_method() == HttpRequest::Method::POST) {
         std::string body = request_.get_body();
@@ -371,6 +392,10 @@ void Connection::handle_api_messages() {
             response_.set_content_length(response_body.size());
             response_.set_body(response_body);
             Logger::instance().info("API: POST /api/messages, name: " + name);
+
+            if (redis_cache && redis_cache->is_connected()) {
+                redis_cache->remove("messages_cache");
+            }
         } else {
             response_.set_error_response(HttpResponse::StatusCode::INTERNAL_SERVER_ERROR,
                                          "Failed to save message");

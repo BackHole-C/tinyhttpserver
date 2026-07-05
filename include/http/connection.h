@@ -9,6 +9,7 @@
 #include "http/http_request.h"
 #include "http/http_response.h"
 #include "cache/file_cache.h"
+#include "cache/redis_cache.h"
 #include "db/database.h"
 
 enum class ConnectionState {
@@ -50,6 +51,7 @@ private:
     void handle_api_messages();
     std::string get_root_dir() const;
     FileCache* get_file_cache() const;
+    RedisCache* get_redis_cache() const;
     Database* get_database() const;
 
     int fd_;

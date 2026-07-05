@@ -151,6 +151,15 @@ void HttpServer::initialize_file_cache() {
     Logger::instance().info("FileCache initialized (max_size: 100MB, ttl: 300s)");
 }
 
+void HttpServer::initialize_redis_cache() {
+    redis_cache_ = std::make_unique<RedisCache>();
+    if (redis_cache_->is_connected()) {
+        Logger::instance().info("RedisCache initialized successfully");
+    } else {
+        Logger::instance().warning("RedisCache initialization failed, falling back to FileCache");
+    }
+}
+
 void HttpServer::initialize_database() {
     char exe_path[4096];
     ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
@@ -201,6 +210,7 @@ void HttpServer::start() {
         initialize_epoll();
         initialize_thread_pool();
         initialize_file_cache();
+        initialize_redis_cache();
         initialize_database();
         is_running_ = true;
 
