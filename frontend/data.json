@@ -1,0 +1,11 @@
+{
+    "server": "TinyHttpServer",
+    "version": "1.0",
+    "status": "running",
+    "features": [
+        "Static file serving",
+        "HTTP/1.1 support",
+        "MIME type detection"
+    ],
+    "next_steps": "Implement epoll for concurrency"
+}

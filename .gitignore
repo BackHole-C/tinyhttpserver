@@ -1,0 +1,24 @@
+# Build output
+build/
+*.o
+*.a
+*.so
+*.dll
+bin/
+
+# Database
+tinyhttp.db
+*.db.backup
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页 - TinyHttpServer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="profile">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20developer%20avatar%20portrait%20clean%20background%20modern%20style&image_size=square"
+                    alt="头像" class="avatar">
+                <h1 class="name">张三</h1>
+                <p class="title">后端工程师 | C++开发者</p>
+            </div>
+            <nav class="nav">
+                <a href="#about">关于我</a>
+                <a href="#skills">技能</a>
+                <a href="#projects">项目</a>
+                <a href="#contact">联系方式</a>
+            </nav>
+        </header>
+
+        <section id="about" class="section">
+            <h2>关于我</h2>
+            <p>热爱技术，专注于高性能服务器开发。拥有丰富的C++编程经验，熟悉Linux系统编程和网络编程。</p>
+            <p>热衷于构建高性能、可扩展的后端系统，对分布式系统和微服务架构有深入理解。</p>
+        </section>
+
+        <section id="skills" class="section">
+            <h2>技能</h2>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <h3>编程语言</h3>
+                    <ul>
+                        <li>C++ / C</li>
+                        <li>Python</li>
+                        <li>Java</li>
+                        <li>Go</li>
+                    </ul>
+                </div>
+                <div class="skill-card">
+                    <h3>技术栈</h3>
+                    <ul>
+                        <li>Linux系统编程</li>
+                        <li>网络编程 (epoll)</li>
+                        <li>数据库 (MySQL)</li>
+                        <li>分布式系统</li>
+                    </ul>
+                </div>
+                <div class="skill-card">
+                    <h3>工具</h3>
+                    <ul>
+                        <li>Git / GitHub</li>
+                        <li>Docker</li>
+                        <li>CMake</li>
+                        <li>VS Code</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="section">
+            <h2>项目</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <h3>TinyHttpServer</h3>
+                    <p>高性能HTTP静态文件服务器，基于epoll + 非阻塞I/O实现，支持万级并发连接。</p>
+                    <div class="project-tags">
+                        <span>C++</span>
+                        <span>epoll</span>
+                        <span>LRU缓存</span>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <h3>分布式缓存系统</h3>
+                    <p>基于一致性哈希的分布式缓存，支持数据分片和故障转移。</p>
+                    <div class="project-tags">
+                        <span>Go</span>
+                        <span>Redis</span>
+                        <span>一致性哈希</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="messages" class="section">
+            <h2>留言板</h2>
+            <div id="messageList">
+                <p>加载中...</p>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <h2>联系方式</h2>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <strong>邮箱:</strong> zhangsan@example.com
+                </div>
+                <div class="contact-item">
+                    <strong>电话:</strong> 138-0000-0000
+                </div>
+                <div class="contact-item">
+                    <strong>GitHub:</strong> <a href="https://github.com/zhangsan">github.com/zhangsan</a>
+                </div>
+            </div>
+            <form class="contact-form" id="contactForm">
+                <input type="text" id="name" placeholder="您的姓名" required>
+                <input type="email" id="email" placeholder="您的邮箱" required>
+                <textarea id="message" placeholder="留言内容" required></textarea>
+                <span id="charCount" class="char-count">0/200</span>
+                <button type="submit">发送</button>
+            </form>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2026 张三. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
